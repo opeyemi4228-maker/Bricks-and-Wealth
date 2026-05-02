@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    scroll-behavior: smooth;
+}
+
+@layer base {
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hero responsiveness tweaks */
+.hero-section {
+  height: 100svh;
+  min-height: clamp(520px, 72vh, 900px);
+}
+
+.hero-headline {
+  font-size: clamp(40px, 7.2vw, 100px);
+  line-height: 0.92;
+}
+
+/* Reduce headline size on large and extra-large screens for improved balance */
+@media (min-width: 1280px) {
+  .hero-headline {
+    font-size: clamp(44px, 6.2vw, 88px);
+  }
+}
+
+@media (min-width: 1600px) {
+  .hero-headline {
+    font-size: 72px;
+  }
+}
+
+/* Make hero copy and CTAs flow better on narrow screens */
+@media (max-width: 640px) {
+  .hero-section .hero-headline {
+    font-size: clamp(30px, 9.5vw, 48px);
+  }
+}
