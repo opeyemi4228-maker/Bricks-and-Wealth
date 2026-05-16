@@ -20,7 +20,7 @@ export async function POST(request) {
     return errorResponse("Invalid request", 403);
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionToken = cookieStore.get("admin_session")?.value;
 
   // Best-effort: revoke session in DB and audit-log if session is valid

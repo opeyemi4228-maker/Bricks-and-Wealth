@@ -114,20 +114,23 @@ export async function POST(request) {
       return errorResponse("Invalid credentials", 401);
     }
 
-    if (user.registrationStatus === "pending") {
-      await recordLoginAttempt({ email: user.email, ip, userAgent, success: false });
-      return errorResponse(
-        "Your registration is pending admin approval. We'll email you once it's approved.",
-        401
-      );
-    }
+    // Registration status checks only apply to investors — admins are never gated
+    if (user.role === "investor") {
+      if (user.registrationStatus === "pending") {
+        await recordLoginAttempt({ email: user.email, ip, userAgent, success: false });
+        return errorResponse(
+          "Your registration is pending admin approval. We'll email you once it's approved.",
+          401
+        );
+      }
 
-    if (user.registrationStatus === "declined") {
-      await recordLoginAttempt({ email: user.email, ip, userAgent, success: false });
-      return errorResponse(
-        "Your registration was not approved. Please contact support.",
-        403
-      );
+      if (user.registrationStatus === "declined") {
+        await recordLoginAttempt({ email: user.email, ip, userAgent, success: false });
+        return errorResponse(
+          "Your registration was not approved. Please contact support.",
+          403
+        );
+      }
     }
 
     if (!user.emailVerified) {
