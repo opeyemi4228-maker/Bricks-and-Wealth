@@ -236,6 +236,12 @@ function Wordmark({ size = "md" }) {
         </span>
         Wealth
       </span>
+      <span
+        className="font-semibold text-white tracking-[0.04em] uppercase"
+        style={{ fontSize: s.text, marginTop: "2px" }}
+      >
+        Holdings
+      </span>
       {size !== "sm" && (
         <span
           className="mt-1.5"

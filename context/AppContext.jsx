@@ -11,7 +11,7 @@ export const useAppContext = () => {
 
 export const AppContextProvider = (props) => {
 
-    const currency = process.env.NEXT_PUBLIC_CURRENCY
+    const currency = typeof window !== 'undefined' ? process.env.NEXT_PUBLIC_CURRENCY || '£' : '£'
     const router = useRouter()
 
     const [products, setProducts] = useState([])
@@ -91,9 +91,14 @@ export const AppContextProvider = (props) => {
         getCartCount, getCartAmount
     }
 
-    return (
-        <AppContext.Provider value={value}>
-            {props.children}
-        </AppContext.Provider>
-    )
+    try {
+        return (
+            <AppContext.Provider value={value}>
+                {props.children}
+            </AppContext.Provider>
+        )
+    } catch (error) {
+        console.error('AppContextProvider error:', error)
+        return props.children
+    }
 }

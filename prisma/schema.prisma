@@ -1,0 +1,236 @@
+// prisma/schema.prisma
+//
+// Brick & Wealth — complete database schema.
+// 8 models: User, AuthToken, LoginAttempt, OnboardingProgress, KycDocument,
+//           Consent, AdminNote, AuditLog.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")          // Pooled — used by your app at runtime
+  directUrl = env("DIRECT_DATABASE_URL")   // Direct — used by Prisma for migrations
+}
+
+// ════════════════════════════════════════════════════════════════════
+// USER — the investor account (and admin accounts)
+// ════════════════════════════════════════════════════════════════════
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  fullName      String
+  username      String      @unique
+  residency     String      // "UK" | "Diaspora"
+  country       String      // ISO 3166-1 alpha-2
+  passwordHash  String?     // null until email verification completes
+  emailVerified Boolean     @default(false)
+
+  // ─── Onboarding profile (set in /portal/verify Step 2) ──────────
+  dateOfBirth         DateTime?
+  ageConfirmed        Boolean   @default(false)
+  addressLine1        String?
+  addressLine2        String?
+  city                String?
+  region              String?   // state / county / province
+  postcode            String?
+  postcodeFormat      String?   // "UK" | "US" | "OTHER"
+  phoneNumber         String?
+  occupation          String?
+  sourceOfFunds       String?   // "salary" | "savings" | "inheritance" | "investment" | "business" | "other"
+  sourceOfFundsDetail String?   // free-text if "other"
+  estimatedNetWorth   String?   // "under_50k" | "50k_250k" | "250k_1m" | "over_1m"
+  investorType        String?   // "retail" | "sophisticated" | "hnw"
+
+  // ─── Status flags (gate the dashboard) ──────────────────────────
+  onboardingComplete   Boolean  @default(false)
+  kycComplete          Boolean  @default(false)
+  kycStatus            String   @default("not_started")  // not_started | pending_review | approved | rejected
+  consentsComplete     Boolean  @default(false)
+  accountActivated     Boolean  @default(false)  // true only when ALL above are true
+
+  // ─── Registration approval (admin-controlled) ───────────────────
+  registrationStatus String   @default("pending")  // pending | approved | declined
+
+  // ─── Admin-related fields (NEW) ─────────────────────────────────
+  role              String    @default("investor")  // investor | admin | super_admin
+  tags              String[]  @default([])          // ["VIP","workshop","diaspora"]
+  flaggedForReview  Boolean   @default(false)
+  flagReason        String?
+  lastSeenAt        DateTime?
+  suspendedAt       DateTime?
+  suspensionReason  String?
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // ─── Relations ──────────────────────────────────────────────────
+  tokens             AuthToken[]
+  kycDocuments       KycDocument[]
+  consents           Consent[]
+  onboardingProgress OnboardingProgress?
+
+  // Admin relations
+  adminNotes         AdminNote[]  @relation("InvestorNotes")
+  authoredNotes      AdminNote[]  @relation("AuthoredNotes")
+  auditLogs          AuditLog[]   @relation("AdminAudits")
+
+  @@index([email])
+  @@index([username])
+  @@index([emailVerified])
+  @@index([kycStatus])
+  @@index([accountActivated])
+  @@index([role])
+  @@index([flaggedForReview])
+  @@index([suspendedAt])
+  @@index([registrationStatus])
+}
+
+// ════════════════════════════════════════════════════════════════════
+// AUTH TOKEN — unified table for register, reset, session
+// Only the SHA-256 hash is stored; raw tokens never touch the DB
+// ════════════════════════════════════════════════════════════════════
+model AuthToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  type      String    // "register" | "reset" | "session"
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash])
+  @@index([userId, type])
+  @@index([expiresAt])
+}
+
+// ════════════════════════════════════════════════════════════════════
+// LOGIN ATTEMPT — audit trail + powers lockout-after-5-failures rule
+// ════════════════════════════════════════════════════════════════════
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  ip        String
+  userAgent String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+}
+
+// ════════════════════════════════════════════════════════════════════
+// ONBOARDING PROGRESS — one row per user, tracks wizard step
+// Idempotent state so refreshes don't lose place
+// ════════════════════════════════════════════════════════════════════
+model OnboardingProgress {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  currentStep     String    @default("password")  // password | profile | kyc | consents | done
+  passwordSetAt   DateTime?
+  profileSavedAt  DateTime?
+  kycStartedAt    DateTime?
+  kycSubmittedAt  DateTime?
+  consentsAt      DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([currentStep])
+}
+
+// ════════════════════════════════════════════════════════════════════
+// KYC DOCUMENT — one row per uploaded file
+// File bytes live at UploadThing; we just store URL + metadata
+// ════════════════════════════════════════════════════════════════════
+model KycDocument {
+  id              String    @id @default(cuid())
+  userId          String
+  documentType    String    // "id_front" | "id_back" | "proof_of_address" | "selfie" | "source_of_funds"
+  fileUrl         String    // UploadThing/S3 hosted URL
+  fileName        String
+  fileSize        Int       // bytes
+  mimeType        String
+  uploadedAt      DateTime  @default(now())
+
+  // Review state — set by admin compliance staff
+  reviewStatus    String    @default("pending")  // pending | approved | rejected
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  rejectionReason String?
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, documentType])
+  @@index([reviewStatus])
+}
+
+// ════════════════════════════════════════════════════════════════════
+// CONSENT — one row per consent type per user
+// Full audit trail: timestamp, IP, user agent, document version
+// ════════════════════════════════════════════════════════════════════
+model Consent {
+  id              String   @id @default(cuid())
+  userId          String
+  consentType     String   // "terms_of_service" | "privacy_policy" | "risk_warning" |
+                           // "cookie_policy" | "marketing_emails" | "data_processing"
+  documentVersion String   // "v1.0" | "v1.1" — track which version they accepted
+  granted         Boolean
+  grantedAt       DateTime @default(now())
+  ip              String
+  userAgent       String
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, consentType, documentVersion])
+  @@index([userId])
+  @@index([consentType])
+}
+
+// ════════════════════════════════════════════════════════════════════
+// ADMIN NOTE — internal notes admins leave on investor profiles
+// Each note has an author (admin) and target (investor)
+// ════════════════════════════════════════════════════════════════════
+model AdminNote {
+  id                 String   @id @default(cuid())
+  targetUserId       String   // the investor the note is about
+  authorAdminId      String   // the admin who wrote it
+  content            String   @db.Text
+  visibleToInvestor  Boolean  @default(false)  // future: share with investor
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  targetUser  User @relation("InvestorNotes", fields: [targetUserId], references: [id], onDelete: Cascade)
+  author      User @relation("AuthoredNotes", fields: [authorAdminId], references: [id])
+
+  @@index([targetUserId])
+  @@index([authorAdminId])
+  @@index([createdAt])
+}
+
+// ════════════════════════════════════════════════════════════════════
+// AUDIT LOG — every admin action recorded for compliance
+// Includes who, what, when, before/after state, IP, user agent
+// ════════════════════════════════════════════════════════════════════
+model AuditLog {
+  id            String   @id @default(cuid())
+  actorAdminId  String   // who did the action
+  action        String   // "approve_kyc" | "reject_kyc" | "update_tags" | etc.
+  entityType    String   // "user" | "kyc_document" | "subscription" | etc.
+  entityId      String   // ID of the thing acted upon
+  beforeJson    Json?    // state before the change
+  afterJson     Json?    // state after the change
+  metadata      Json?    // extra context (reason, ip, etc.)
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+
+  actor User @relation("AdminAudits", fields: [actorAdminId], references: [id])
+
+  @@index([actorAdminId])
+  @@index([entityType, entityId])
+  @@index([action])
+  @@index([createdAt])
+}

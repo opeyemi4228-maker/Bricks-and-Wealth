@@ -1,6 +1,5 @@
 "use client";
 
-import { Montserrat, Cormorant_Garamond } from "next/font/google";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
@@ -16,26 +15,8 @@ import {
   Hourglass,
 } from "lucide-react";
 
-// ─── Fonts ────────────────────────────────────────────────────────────────────
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-montserrat",
-  display: "swap",
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
-
 // ─── Brand tokens ─────────────────────────────────────────────────────────────
 const NAVY_900 = "#0A1F44";
-const NAVY_950 = "#06142F";
-const NAVY_700 = "#15326B";
 const GOLD = "#C9A24A";
 const GOLD_LIGHT = "#D9B560";
 const GOLD_DARK = "#9A7A2E";
@@ -48,7 +29,7 @@ const INK_MID = "#4A5468";
 const INK_DIM = "#8A93A6";
 const WHITE = "#FFFFFF";
 
-// ─── Six operating principles ────────────────────────────────────────────────
+// ─── 6 operating principles ──────────────────────────────────────────────────
 const PRINCIPLES = [
   {
     id: "ring-fenced",
@@ -64,7 +45,7 @@ const PRINCIPLES = [
       "No cross-collateralisation",
       "Bankruptcy-remote from the platform",
     ],
-    href: "/how-it-works/spv-structure",
+    href: "/how-it-works#co-ownership",
     image:
       "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=85&auto=format&fit=crop",
   },
@@ -82,7 +63,7 @@ const PRINCIPLES = [
       "Annual third-party audit",
       "Quarterly investor reporting",
     ],
-    href: "/company/compliance",
+    href: "/company#compliance",
     image:
       "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1200&q=85&auto=format&fit=crop",
   },
@@ -118,7 +99,7 @@ const PRINCIPLES = [
       "Mortgage & lender documentation",
       "Audit-ready paper trail",
     ],
-    href: "/how-it-works/transparency",
+    href: "/company#compliance",
     image:
       "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=1200&q=85&auto=format&fit=crop",
   },
@@ -136,7 +117,7 @@ const PRINCIPLES = [
       "Transparent fee schedule upfront",
       "No carried interest above benchmark",
     ],
-    href: "/how-it-works/alignment",
+    href: "/company#about",
     image:
       "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=1200&q=85&auto=format&fit=crop",
   },
@@ -154,7 +135,7 @@ const PRINCIPLES = [
       "Pre-defined exit narrative per SPV",
       "Secondary market for share resale",
     ],
-    href: "/how-it-works/timelines",
+    href: "/how-it-works#exit",
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=85&auto=format&fit=crop",
   },
@@ -211,14 +192,12 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
               transition: "transform 0.6s ease",
             }}
           />
-          {/* Navy tint */}
           <div
             className="absolute inset-0"
             style={{
               background: `linear-gradient(to bottom, rgba(10,31,68,0.2) 0%, rgba(6,20,47,0.7) 100%)`,
             }}
           />
-          {/* Gold rule on top of image */}
           <div
             className="absolute top-0 left-0 right-0 h-px"
             style={{
@@ -226,7 +205,6 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
               opacity: 0.6,
             }}
           />
-          {/* Number badge overlay */}
           <div
             className="absolute top-4 left-4 px-2.5 py-1"
             style={{
@@ -246,7 +224,6 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
         </div>
 
         <div className="flex flex-col flex-1 p-7 relative">
-          {/* Gold corner accents on active state */}
           {isActive && (
             <>
               <div
@@ -262,7 +239,6 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
             </>
           )}
 
-          {/* Number + Icon row — only shown when image is hidden */}
           <div className="flex items-start justify-between mb-5">
             <span
               className={`text-[11px] font-extrabold tracking-[0.3em] transition-all duration-300 ${
@@ -277,7 +253,9 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
             <div
               className="w-11 h-11 grid place-items-center transition-all duration-300"
               style={{
-                backgroundColor: isActive ? "rgba(201,162,74,0.18)" : GOLD_DIM,
+                backgroundColor: isActive
+                  ? "rgba(201,162,74,0.18)"
+                  : GOLD_DIM,
                 border: `1px solid ${GOLD_BORD}`,
                 borderRadius: "1px",
               }}
@@ -289,7 +267,6 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
             </div>
           </div>
 
-          {/* Label */}
           <p
             className="text-[10.5px] font-bold tracking-[0.24em] uppercase mb-3 transition-colors duration-300"
             style={{ color: isActive ? GOLD_LIGHT : INK_DIM }}
@@ -297,7 +274,6 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
             {principle.label}
           </p>
 
-          {/* Cormorant editorial headline */}
           <h3
             className="leading-tight tracking-[-0.005em] mb-4 transition-colors duration-300"
             style={{
@@ -310,7 +286,6 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
             {principle.headline}
           </h3>
 
-          {/* Body — expands on hover */}
           <AnimatePresence initial={false}>
             {isActive && (
               <motion.div
@@ -344,7 +319,6 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
             )}
           </AnimatePresence>
 
-          {/* Short body — visible when not active */}
           {!isActive && (
             <p
               className="text-[13px] leading-relaxed flex-1"
@@ -356,7 +330,6 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
             </p>
           )}
 
-          {/* CTA */}
           <div
             className="flex items-center justify-between mt-6 pt-4 text-[10.5px] font-extrabold tracking-[0.14em] uppercase transition-colors duration-300"
             style={{
@@ -378,22 +351,24 @@ function PrincipleCard({ principle, index, isActive, onEnter, onLeave }) {
   );
 }
 
-// ─── Principles Section ──────────────────────────────────────────────────────
-export default function PrinciplesSection() {
+// ═════════════════════════════════════════════════════════════════════════════
+// EXPORTED SECTION
+// ═════════════════════════════════════════════════════════════════════════════
+export default function OperatingPrinciplesGrid() {
   const [activeId, setActiveId] = useState(null);
   const headerRef = useRef(null);
   const inView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
     <section
-      className={`${montserrat.variable} ${cormorant.variable} relative overflow-hidden`}
+      className="relative overflow-hidden"
       style={{
         backgroundColor: CREAM,
-        fontFamily: "var(--font-montserrat), sans-serif",
+        padding: "100px 0",
       }}
-      aria-labelledby="principles-heading"
+      aria-labelledby="principles-grid-heading"
     >
-      {/* ══ TOP RULE ════════════════════════════════════════════════════ */}
+      {/* Top + bottom rules */}
       <div
         className="absolute top-0 left-0 right-0 h-px pointer-events-none"
         style={{
@@ -401,13 +376,19 @@ export default function PrinciplesSection() {
         }}
         aria-hidden="true"
       />
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${GOLD_BORD}, transparent)`,
+        }}
+        aria-hidden="true"
+      />
 
-      {/* ══ DECORATIVE BACKGROUND ══════════════════════════════════════ */}
+      {/* Decorative bg */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden"
         aria-hidden="true"
       >
-        {/* Gold dot pattern bottom left */}
         <svg
           className="absolute left-0 bottom-0 opacity-[0.05]"
           width="320"
@@ -415,7 +396,7 @@ export default function PrinciplesSection() {
         >
           <defs>
             <pattern
-              id="prin-dots"
+              id="prin-grid-dots"
               x="0"
               y="0"
               width="22"
@@ -425,26 +406,9 @@ export default function PrinciplesSection() {
               <circle cx="2" cy="2" r="1.2" fill={GOLD} />
             </pattern>
           </defs>
-          <rect width="320" height="320" fill="url(#prin-dots)" />
+          <rect width="320" height="320" fill="url(#prin-grid-dots)" />
         </svg>
 
-        {/* Ghost roman numeral "III" — third chapter mark */}
-        <div
-          className="absolute -right-8 top-1/2 -translate-y-1/2 select-none leading-none pointer-events-none"
-          style={{
-            fontFamily: "var(--font-cormorant), serif",
-            fontWeight: 500,
-            fontStyle: "italic",
-            fontSize: "clamp(140px, 22vw, 320px)",
-            color: "transparent",
-            WebkitTextStroke: "1px rgba(10,31,68,0.05)",
-            userSelect: "none",
-          }}
-        >
-          III
-        </div>
-
-        {/* Stacked-bricks logomark — top left, faint */}
         <svg
           className="absolute -top-16 -left-16 opacity-[0.04]"
           width="380"
@@ -473,26 +437,8 @@ export default function PrinciplesSection() {
         </svg>
       </div>
 
-      <div className="max-w-[1300px] mx-auto px-5 sm:px-8 xl:px-10 pt-20 md:pt-28 pb-20 md:pb-28 relative">
-        {/* Vertical editorial label */}
-        <div
-          className="hidden xl:flex items-center gap-3 absolute right-3 top-32"
-          style={{ writingMode: "vertical-rl" }}
-          aria-hidden="true"
-        >
-          <span
-            className="text-[9px] font-bold tracking-[0.4em] uppercase"
-            style={{ color: INK_DIM }}
-          >
-            Six Operating Principles · Chapter Three
-          </span>
-          <div
-            className="w-px h-10"
-            style={{ backgroundColor: GOLD, opacity: 0.6 }}
-          />
-        </div>
-
-        {/* ══ HEADER ═════════════════════════════════════════════════════ */}
+      <div className="max-w-[1300px] mx-auto px-5 sm:px-8 xl:px-10 relative">
+        {/* Header */}
         <div
           ref={headerRef}
           className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16"
@@ -502,33 +448,35 @@ export default function PrinciplesSection() {
               className="flex items-center gap-3 mb-5"
               initial={{ opacity: 0, x: -20 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.6 }}
             >
               <div className="w-8 h-px" style={{ backgroundColor: GOLD }} />
               <span
                 className="text-[11px] font-bold tracking-[0.32em] uppercase"
                 style={{ color: GOLD_DARK }}
               >
-                Why Brick &amp; Wealth
+                Operating Principles
               </span>
             </motion.div>
 
             <motion.h2
-              id="principles-heading"
+              id="principles-grid-heading"
               className="leading-[0.96]"
               style={{
                 fontFamily: "var(--font-cormorant), serif",
                 fontWeight: 500,
-                fontSize: "clamp(40px, 5.5vw, 76px)",
+                fontSize: "clamp(40px, 5.5vw, 72px)",
                 letterSpacing: "-0.018em",
                 color: INK,
               }}
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.75, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.75, delay: 0.1 }}
             >
               Six{" "}
-              <em style={{ color: GOLD_DARK, fontWeight: 400 }}>principles.</em>
+              <em style={{ color: GOLD_DARK, fontWeight: 400 }}>
+                principles.
+              </em>
               <br />
               Every SPV,{" "}
               <em
@@ -540,7 +488,6 @@ export default function PrinciplesSection() {
                 }}
               >
                 without exception
-                {/* Hand-drawn underline */}
                 <svg
                   className="absolute -bottom-2 left-0 w-full"
                   height="14"
@@ -573,7 +520,7 @@ export default function PrinciplesSection() {
             className="flex flex-col items-start md:items-end gap-4 max-w-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.65, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.65, delay: 0.2 }}
           >
             <p
               className="text-[13.5px] leading-relaxed md:text-right hidden md:block"
@@ -584,7 +531,7 @@ export default function PrinciplesSection() {
               same way, every time.
             </p>
             <Link
-              href="/company/principles"
+              href="#compliance"
               className="inline-flex items-center gap-2 text-[11.5px] font-extrabold tracking-[0.14em] uppercase transition-all duration-200 group"
               style={{ color: INK }}
             >
@@ -594,7 +541,7 @@ export default function PrinciplesSection() {
                   paddingBottom: 2,
                 }}
               >
-                The Operating Manual
+                The Compliance Framework
               </span>
               <ArrowRight
                 size={13}
@@ -605,7 +552,7 @@ export default function PrinciplesSection() {
           </motion.div>
         </div>
 
-        {/* ══ PRINCIPLES GRID ════════════════════════════════════════════ */}
+        {/* Principles grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {PRINCIPLES.map((principle, i) => (
             <PrincipleCard
@@ -619,7 +566,7 @@ export default function PrinciplesSection() {
           ))}
         </div>
 
-        {/* ══ BOTTOM INFO BAND ═══════════════════════════════════════════ */}
+        {/* Bottom info band */}
         <motion.div
           className="mt-16 grid grid-cols-1 md:grid-cols-3 overflow-hidden"
           style={{
@@ -629,23 +576,23 @@ export default function PrinciplesSection() {
           }}
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, delay: 0.4 }}
         >
           {[
             {
               label: "Read the Compliance Brief",
               sub: "FCA framework, AML & KYC explained",
-              href: "/company/compliance",
+              href: "/company#compliance",
             },
             {
               label: "Inspect a Sample SPV Pack",
               sub: "Full subscription documents",
-              href: "/how-it-works/sample-pack",
+              href: "/how-it-works#process",
             },
             {
-              label: "Speak With Our Lawyers",
+              label: "Speak With Our Team",
               sub: "Independent advisors on call",
-              href: "/company/contact",
+              href: "/company#contact",
             },
           ].map(({ label, sub, href }, i) => (
             <Link
@@ -688,15 +635,6 @@ export default function PrinciplesSection() {
           ))}
         </motion.div>
       </div>
-
-      {/* ══ BOTTOM RULE ════════════════════════════════════════════════ */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${GOLD_BORD}, transparent)`,
-        }}
-        aria-hidden="true"
-      />
     </section>
   );
 }

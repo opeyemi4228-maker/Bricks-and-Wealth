@@ -630,6 +630,12 @@ function MobileMenu({ isOpen, onClose, pathname }) {
                     Wealth
                   </span>
                   <span
+                    className="font-semibold text-white text-[16px] tracking-[0.04em] uppercase"
+                    style={{ marginTop: "2px" }}
+                  >
+                    Holdings
+                  </span>
+                  <span
                     className="mt-1"
                     style={{
                       color: GOLD_LIGHT,
@@ -1024,6 +1030,12 @@ export default function Navbar() {
                   &amp;
                 </span>
                 Wealth
+              </span>
+              <span
+                className="font-semibold text-[18px] tracking-[0.04em] uppercase transition-colors duration-[350ms] hidden sm:block"
+                style={{ color: scrolled ? NAVY_900 : WHITE, marginTop: "2px" }}
+              >
+                Holdings
               </span>
               <span
                 className="mt-1 hidden sm:block transition-colors duration-[350ms]"

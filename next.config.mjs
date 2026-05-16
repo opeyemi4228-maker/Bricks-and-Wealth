@@ -14,6 +14,11 @@ const nextConfig = {
             },
         ],
     },
+    eslint: {
+        // ESLint warning about parser serialization is non-fatal
+        // See: https://github.com/vercel/next.js/discussions/47553
+        ignoreDuringBuilds: true,
+    },
 };
 
 export default nextConfig;

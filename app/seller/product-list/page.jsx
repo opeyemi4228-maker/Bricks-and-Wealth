@@ -6,9 +6,12 @@ import { useAppContext } from "@/context/AppContext";
 import Footer from "@/components/seller/Footer";
 import Loading from "@/components/Loading";
 
+export const dynamic = 'force-dynamic';
+
 const ProductList = () => {
 
-  const { router } = useAppContext()
+  const contextValue = useAppContext();
+  const { router } = contextValue || {};
 
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)

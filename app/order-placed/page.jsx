@@ -4,15 +4,20 @@ import { useAppContext } from '@/context/AppContext'
 import Image from 'next/image'
 import { useEffect } from 'react'
 
+export const dynamic = 'force-dynamic';
+
 const OrderPlaced = () => {
 
-  const { router } = useAppContext()
+  const contextValue = useAppContext();
+  const { router } = contextValue || {};
 
   useEffect(() => {
-    setTimeout(() => {
-      router.push('/my-orders')
-    }, 5000)
-  }, [])
+    if (router) {
+      setTimeout(() => {
+        router.push('/my-orders')
+      }, 5000)
+    }
+  }, [router])
 
   return (
     <div className='h-screen flex flex-col justify-center items-center gap-5'>

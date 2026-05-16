@@ -1,6 +1,8 @@
 import { Montserrat, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import ClientLayoutWrapper from "@/app/ClientLayoutWrapper";
+import { AppContextProvider } from "@/context/AppContext";
+import FooterWrapper from "@/app/FooterWrapper";
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
 const montserrat = Montserrat({
@@ -116,6 +118,7 @@ export default function RootLayout({ children }) {
           backgroundColor: "#F8F4EC",
           color: "#0B1220",
         }}
+        suppressHydrationWarning
       >
         {/* ══ GLOBAL JSON-LD: FinancialService + Organization ═════════════ */}
         <script
@@ -167,13 +170,18 @@ export default function RootLayout({ children }) {
           Skip to main content
         </a>
 
-        {/* ══ Navigation ══════════════════════════════════════════════════ */}
-        <ClientLayoutWrapper />
+        <AppContextProvider>
+          {/* ══ Navigation ══════════════════════════════════════════════════ */}
+          <ClientLayoutWrapper />
 
-        {/* ══ Page content ════════════════════════════════════════════════ */}
-        <main id="main-content" tabIndex={-1}>
-          {children}
-        </main>
+          {/* ══ Page content ════════════════════════════════════════════════ */}
+          <main id="main-content" tabIndex={-1}>
+            {children}
+          </main>
+
+          {/* ══ Footer ══════════════════════════════════════════════════════ */}
+          <FooterWrapper />
+        </AppContextProvider>
       </body>
     </html>
   );

@@ -2,16 +2,24 @@
 
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { Suspense } from "react";
+
+function NavbarContent() {
+  const pathname = usePathname();
+  const isPortalPage = pathname?.startsWith("/portal");
+  const isAdminPage = pathname?.startsWith("/admin");
+
+  if (isPortalPage || isAdminPage) {
+    return null;
+  }
+
+  return <Navbar />;
+}
 
 export default function ClientLayoutWrapper() {
-  const pathname = usePathname();
-  const isPortalPage = pathname.startsWith("/portal");
-
   return (
-    <>
-      {!isPortalPage && <Navbar />}
-      {!isPortalPage && <Footer />}
-    </>
+    <Suspense fallback={null}>
+      <NavbarContent />
+    </Suspense>
   );
 }

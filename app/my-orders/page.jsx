@@ -7,9 +7,12 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Loading from "@/components/Loading";
 
+export const dynamic = 'force-dynamic';
+
 const MyOrders = () => {
 
-    const { currency } = useAppContext();
+    const contextValue = useAppContext();
+    const { currency = '£' } = contextValue || {};
 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);

@@ -6,9 +6,12 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { useAppContext } from "@/context/AppContext";
 
+export const dynamic = 'force-dynamic';
+
 const Cart = () => {
 
-  const { products, router, cartItems, addToCart, updateCartQuantity, getCartCount } = useAppContext();
+  const contextValue = useAppContext();
+  const { products = [], router, cartItems = {}, addToCart, updateCartQuantity, getCartCount } = contextValue || {};
 
   return (
     <>

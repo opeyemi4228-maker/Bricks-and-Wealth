@@ -10,11 +10,14 @@ import Loading from "@/components/Loading";
 import { useAppContext } from "@/context/AppContext";
 import React from "react";
 
+export const dynamic = 'force-dynamic';
+
 const Product = () => {
 
     const { id } = useParams();
 
-    const { products, router, addToCart } = useAppContext()
+    const contextValue = useAppContext();
+    const { products = [], router, addToCart } = contextValue || {};
 
     const [mainImage, setMainImage] = useState(null);
     const [productData, setProductData] = useState(null);

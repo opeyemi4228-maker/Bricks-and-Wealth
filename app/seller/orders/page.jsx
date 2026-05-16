@@ -6,9 +6,12 @@ import { useAppContext } from "@/context/AppContext";
 import Footer from "@/components/seller/Footer";
 import Loading from "@/components/Loading";
 
+export const dynamic = 'force-dynamic';
+
 const Orders = () => {
 
-    const { currency } = useAppContext();
+    const contextValue = useAppContext();
+    const { currency = '£' } = contextValue || {};
 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
